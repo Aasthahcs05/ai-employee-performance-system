@@ -145,3 +145,40 @@ th, td {
     padding: 16px;
   }
 }
+.analytics-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 15px;
+  margin-bottom: 20px;
+}
+
+.analytics-box {
+  background: #f1f5f9;
+  padding: 18px;
+  border-radius: 12px;
+  text-align: center;
+}
+
+.analytics-box h3 {
+  margin: 0;
+  color: #334155;
+}
+
+.analytics-box p {
+  font-size: 28px;
+  font-weight: bold;
+  margin: 10px 0 0;
+  color: #2563eb;
+}
+
+.chart-box {
+  width: 100%;
+  height: 320px;
+  margin: 20px 0;
+}
+
+@media (max-width: 768px) {
+  .analytics-grid {
+    grid-template-columns: 1fr;
+  }
+}
