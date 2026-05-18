@@ -253,11 +253,11 @@ app.post("/api/employees", protect, async (req, res, next) => {
     });
   } catch (error) {
     if (error.code === 11000) {
-      return res.status(400).json({
-        success: false,
-        message: "Duplicate email error"
-      });
-    }
+  return res.status(400).json({
+    success: false,
+    message: `Duplicate field error: ${JSON.stringify(error.keyValue)}`
+  });
+}
 
     next(error);
   }
