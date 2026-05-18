@@ -12,6 +12,31 @@ function Dashboard() {
   const [employees, setEmployees] = useState([]);
   const [activeSection, setActiveSection] = useState("dashboard");
   const [showForm, setShowForm] = useState(false);
+  const [chatOpen, setChatOpen] = useState(false);
+  const [chatMessages, setChatMessages] = useState([{ sender: 'bot', text: 'Hi! I am InsightHR Assistant. How can I help you today?' }]);
+  const [chatInput, setChatInput] = useState('');
+
+  const handleSendMessage = (e) => {
+    e.preventDefault();
+    if (!chatInput.trim()) return;
+    setChatMessages(prev => [...prev, { sender: 'user', text: chatInput }, { sender: 'bot', text: 'I am a simple AI assistant. I recommend using our AI Analytics tab to get the best insights!' }]);
+    setChatInput('');
+  };
+
+  const handleExportCSV = () => {
+    const headers = ["Name,Email,Department,Performance Score"];
+    const rows = safeEmployees.map(emp => 
+      `"${emp.name}","${emp.email}","${emp.department}","${emp.performanceScore}"`
+    );
+    const csvContent = "data:text/csv;charset=utf-8," + [headers, ...rows].join("\n");
+    const encodedUri = encodeURI(csvContent);
+    const link = document.createElement("a");
+    link.setAttribute("href", encodedUri);
+    link.setAttribute("download", "employees_data.csv");
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+  };
 
   const fetchEmployees = async () => {
     try {
@@ -175,12 +200,18 @@ function Dashboard() {
                 <p>Manage employees, performance scores, skills, and departments.</p>
               </div>
 
-              <button className="primary-btn small" onClick={() => setShowForm(!showForm)}>
-                {showForm ? "Close Form" : "+ Add Employee"}
-              </button>
+              <div style={{display: 'flex', gap: '10px'}}>
+                <button className="outline-btn small" onClick={handleExportCSV}>
+                  📥 Export CSV
+                </button>
+                <button className="primary-btn small" onClick={() => setShowForm(!showForm)}>
+                  {showForm ? "Close Form" : "+ Add Employee"}
+                </button>
+              </div>
             </div>
 
             <SearchFilter
+              employees={safeEmployees}
               setEmployees={setEmployees}
               fetchEmployees={fetchEmployees}
             />
@@ -226,6 +257,35 @@ function Dashboard() {
         }}>
           +
         </button>
+
+        {chatOpen && (
+          <div className="chatbot-window">
+            <div className="chatbot-header">
+              <h4>HR Assistant</h4>
+              <button onClick={() => setChatOpen(false)}>×</button>
+            </div>
+            <div className="chatbot-messages">
+              {chatMessages.map((msg, idx) => (
+                <div key={idx} className={`chat-message ${msg.sender}`}>
+                  <p>{msg.text}</p>
+                </div>
+              ))}
+            </div>
+            <form className="chatbot-input" onSubmit={handleSendMessage}>
+              <input 
+                value={chatInput} 
+                onChange={(e) => setChatInput(e.target.value)} 
+                placeholder="Ask me anything..." 
+              />
+              <button type="submit">Send</button>
+            </form>
+          </div>
+        )}
+        {!chatOpen && (
+          <button className="floating-chat-btn" onClick={() => setChatOpen(true)}>
+            💬
+          </button>
+        )}
       </main>
     </div>
   );

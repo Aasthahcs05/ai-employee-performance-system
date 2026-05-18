@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import API from "../api";
 
 function AIRecommendation() {
@@ -16,6 +16,12 @@ function AIRecommendation() {
       setLoading(false);
     }
   };
+
+  useEffect(() => {
+    const handleGenerate = () => generateAI();
+    window.addEventListener("generate-insights", handleGenerate);
+    return () => window.removeEventListener("generate-insights", handleGenerate);
+  }, []);
 
   return (
     <div className="content-card ai-section">
