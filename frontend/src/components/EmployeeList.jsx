@@ -1,6 +1,6 @@
 import API from "../api";
 
-function EmployeeList({ employees, fetchEmployees }) {
+function EmployeeList({ employees = [], fetchEmployees }) {
   const deleteEmployee = async (id) => {
     await API.delete(`/api/employees/${id}`);
     fetchEmployees();
@@ -8,7 +8,7 @@ function EmployeeList({ employees, fetchEmployees }) {
 
   const increaseScore = async (emp) => {
     await API.put(`/api/employees/${emp._id}`, {
-      performanceScore: Math.min(emp.performanceScore + 5, 100)
+      performanceScore: Math.min(Number(emp.performanceScore || 0) + 5, 100)
     });
 
     fetchEmployees();
@@ -18,8 +18,10 @@ function EmployeeList({ employees, fetchEmployees }) {
     employees.length === 0
       ? 0
       : (
-          employees.reduce((sum, emp) => sum + emp.performanceScore, 0) /
-          employees.length
+          employees.reduce(
+            (sum, emp) => sum + Number(emp.performanceScore || 0),
+            0
+          ) / employees.length
         ).toFixed(1);
 
   return (
@@ -32,7 +34,7 @@ function EmployeeList({ employees, fetchEmployees }) {
 
         <div>
           <p>Active Roles</p>
-          <h2>{new Set(employees.map((emp) => emp.department)).size}</h2>
+          <h2>{new Set(employees.map((emp) => emp.department || "Unknown")).size}</h2>
         </div>
 
         <div>
@@ -68,42 +70,51 @@ function EmployeeList({ employees, fetchEmployees }) {
             </thead>
 
             <tbody>
-              {employees.map((emp) => (
-                <tr key={emp._id}>
-                  <td>
-                    <div className="employee-cell">
-                      <div className="avatar">{emp.name.charAt(0)}</div>
-                      <div>
-                        <h4>{emp.name}</h4>
-                        <p>{emp.email}</p>
+              {employees.map((emp) => {
+                const name = emp?.name || "Employee";
+                const email = emp?.email || "No email";
+                const department = emp?.department || "Not Assigned";
+                const score = Number(emp?.performanceScore || 0);
+                const skills = Array.isArray(emp?.skills) ? emp.skills : [];
+                const experience = emp?.experience ?? 0;
+
+                return (
+                  <tr key={emp?._id || email}>
+                    <td>
+                      <div className="employee-cell">
+                        <div className="avatar">{name.charAt(0).toUpperCase()}</div>
+                        <div>
+                          <h4>{name}</h4>
+                          <p>{email}</p>
+                        </div>
                       </div>
-                    </div>
-                  </td>
+                    </td>
 
-                  <td>{emp.department}</td>
+                    <td>{department}</td>
 
-                  <td>
-                    <div className="score-cell">
-                      <div className="score-bar">
-                        <span style={{ width: `${emp.performanceScore}%` }}></span>
+                    <td>
+                      <div className="score-cell">
+                        <div className="score-bar">
+                          <span style={{ width: `${score}%` }}></span>
+                        </div>
+                        <strong>{score}</strong>
                       </div>
-                      <strong>{emp.performanceScore}</strong>
-                    </div>
-                  </td>
+                    </td>
 
-                  <td>{emp.skills.join(", ")}</td>
-                  <td>{emp.experience} years</td>
+                    <td>{skills.length > 0 ? skills.join(", ") : "No skills"}</td>
+                    <td>{experience} years</td>
 
-                  <td>
-                    <button className="text-btn" onClick={() => increaseScore(emp)}>
-                      + Score
-                    </button>
-                    <button className="delete-btn" onClick={() => deleteEmployee(emp._id)}>
-                      Delete
-                    </button>
-                  </td>
-                </tr>
-              ))}
+                    <td>
+                      <button className="text-btn" onClick={() => increaseScore(emp)}>
+                        + Score
+                      </button>
+                      <button className="delete-btn" onClick={() => deleteEmployee(emp._id)}>
+                        Delete
+                      </button>
+                    </td>
+                  </tr>
+                );
+              })}
             </tbody>
           </table>
         </div>

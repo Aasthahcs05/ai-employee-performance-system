@@ -1,5 +1,16 @@
 function Sidebar({ activeSection, setActiveSection }) {
-  const user = JSON.parse(localStorage.getItem("user")) || { name: "Admin User" };
+  let user = { name: "Admin User" };
+
+  try {
+    const storedUser = JSON.parse(localStorage.getItem("user"));
+    if (storedUser && storedUser.name) {
+      user = storedUser;
+    }
+  } catch {
+    user = { name: "Admin User" };
+  }
+
+  const userInitial = user?.name ? user.name.charAt(0).toUpperCase() : "A";
 
   return (
     <aside className="sidebar">
@@ -36,7 +47,7 @@ function Sidebar({ activeSection, setActiveSection }) {
         <button>❔ Support</button>
 
         <div className="user-box">
-          <div className="avatar">{user.name.charAt(0)}</div>
+          <div className="avatar">{userInitial}</div>
           <div>
             <h4>{user.name}</h4>
             <p>System Admin</p>

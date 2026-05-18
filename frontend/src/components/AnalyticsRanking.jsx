@@ -7,18 +7,28 @@ import {
   ResponsiveContainer
 } from "recharts";
 
-function AnalyticsRanking({ employees, compact = false }) {
-  const totalEmployees = employees.length;
+function AnalyticsRanking({ employees = [], compact = false }) {
+  const safeEmployees = employees.map((emp) => ({
+    ...emp,
+    name: emp?.name || "Employee",
+    email: emp?.email || "No email",
+    department: emp?.department || "Not Assigned",
+    skills: Array.isArray(emp?.skills) ? emp.skills : [],
+    performanceScore: Number(emp?.performanceScore || 0),
+    experience: emp?.experience ?? 0
+  }));
+
+  const totalEmployees = safeEmployees.length;
 
   const averageScore =
     totalEmployees === 0
       ? 0
       : (
-          employees.reduce((sum, emp) => sum + emp.performanceScore, 0) /
+          safeEmployees.reduce((sum, emp) => sum + emp.performanceScore, 0) /
           totalEmployees
         ).toFixed(1);
 
-  const rankedEmployees = [...employees].sort(
+  const rankedEmployees = [...safeEmployees].sort(
     (a, b) => b.performanceScore - a.performanceScore
   );
 
@@ -93,14 +103,14 @@ function AnalyticsRanking({ employees, compact = false }) {
 
               <tbody>
                 {rankedEmployees.map((emp, index) => (
-                  <tr key={emp._id}>
+                  <tr key={emp?._id || emp.email}>
                     <td>
                       <span className="rank-badge">{index + 1}</span>
                     </td>
 
                     <td>
                       <div className="employee-cell">
-                        <div className="avatar">{emp.name.charAt(0)}</div>
+                        <div className="avatar">{emp.name.charAt(0).toUpperCase()}</div>
                         <div>
                           <h4>{emp.name}</h4>
                           <p>{emp.email}</p>
