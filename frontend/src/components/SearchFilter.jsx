@@ -15,19 +15,23 @@ function SearchFilter({ setEmployees, fetchEmployees }) {
   };
 
   return (
-    <div className="card">
-      <h2>Search & Filter Section</h2>
-
-      <div className="search-box">
+    <div className="search-panel">
+      <div className="big-search">
+        🔍
         <input
-          placeholder="Search by department"
+          placeholder="Search by department..."
           value={department}
           onChange={(e) => setDepartment(e.target.value)}
         />
-
-        <button onClick={searchEmployees}>Search</button>
-        <button onClick={fetchEmployees}>Reset</button>
       </div>
+
+      <button className="outline-btn" onClick={searchEmployees}>
+        Filters
+      </button>
+
+      <button className="primary-btn small" onClick={fetchEmployees}>
+        Reset
+      </button>
     </div>
   );
 }

@@ -7,7 +7,7 @@ import {
   ResponsiveContainer
 } from "recharts";
 
-function AnalyticsRanking({ employees }) {
+function AnalyticsRanking({ employees, compact = false }) {
   const totalEmployees = employees.length;
 
   const averageScore =
@@ -16,7 +16,7 @@ function AnalyticsRanking({ employees }) {
       : (
           employees.reduce((sum, emp) => sum + emp.performanceScore, 0) /
           totalEmployees
-        ).toFixed(2);
+        ).toFixed(1);
 
   const rankedEmployees = [...employees].sort(
     (a, b) => b.performanceScore - a.performanceScore
@@ -25,75 +25,132 @@ function AnalyticsRanking({ employees }) {
   const topEmployee = rankedEmployees.length > 0 ? rankedEmployees[0] : null;
 
   const chartData = rankedEmployees.map((emp) => ({
-    name: emp.name,
+    name: emp.name.split(" ")[0],
     score: emp.performanceScore
   }));
 
   return (
-    <div className="card">
-      <h2>Employee Analytics & Rankings</h2>
-
-      <div className="analytics-grid">
-        <div className="analytics-box">
-          <h3>Total Employees</h3>
-          <p>{totalEmployees}</p>
-        </div>
-
-        <div className="analytics-box">
-          <h3>Average Score</h3>
-          <p>{averageScore}</p>
-        </div>
-
-        <div className="analytics-box">
-          <h3>Top Performer</h3>
-          <p>{topEmployee ? topEmployee.name : "No Data"}</p>
+    <div className="content-card analytics-card">
+      <div className="card-header">
+        <div>
+          <h2>{compact ? "Team Performance Trends" : "Employee Analytics & Rankings"}</h2>
+          <p>Aggregate performance scores and ranking insights.</p>
         </div>
       </div>
 
-      <h3>Performance Score Graph</h3>
+      {!compact && (
+        <div className="analytics-grid">
+          <div className="analytics-box">
+            <p>Total Employees</p>
+            <h2>{totalEmployees}</h2>
+          </div>
+
+          <div className="analytics-box">
+            <p>Average Score</p>
+            <h2>{averageScore}</h2>
+          </div>
+
+          <div className="analytics-box">
+            <p>Top Performer</p>
+            <h2>{topEmployee ? topEmployee.name : "No Data"}</h2>
+          </div>
+        </div>
+      )}
 
       <div className="chart-box">
         {chartData.length > 0 ? (
-          <ResponsiveContainer width="100%" height={300}>
+          <ResponsiveContainer width="100%" height={compact ? 260 : 320}>
             <BarChart data={chartData}>
               <XAxis dataKey="name" />
               <YAxis domain={[0, 100]} />
               <Tooltip />
-              <Bar dataKey="score" fill="#2563eb" />
+              <Bar dataKey="score" fill="#075fc9" radius={[8, 8, 0, 0]} />
             </BarChart>
           </ResponsiveContainer>
         ) : (
-          <p>No data available for graph</p>
+          <p className="empty-text">No data available for graph</p>
         )}
       </div>
 
-      <h3>Performance Ranking</h3>
+      {!compact && (
+        <div className="ranking-table">
+          <div className="card-header">
+            <h2>Performance Rankings</h2>
+          </div>
 
-      <div className="table-wrapper">
-        <table>
-          <thead>
-            <tr>
-              <th>Rank</th>
-              <th>Employee</th>
-              <th>Department</th>
-              <th>Performance Score</th>
-            </tr>
-          </thead>
+          <div className="table-wrapper">
+            <table>
+              <thead>
+                <tr>
+                  <th>Rank</th>
+                  <th>Employee</th>
+                  <th>Department</th>
+                  <th>KPI Progress</th>
+                  <th>AI Score</th>
+                  <th>Status</th>
+                </tr>
+              </thead>
 
-          <tbody>
-            {rankedEmployees.map((emp, index) => (
-              <tr key={emp._id}>
-                <td>#{index + 1}</td>
-                <td>{emp.name}</td>
-                <td>{emp.department}</td>
-                <td>{emp.performanceScore}</td>
-              </tr>
-            ))}
-          </tbody>
-        </table>
-      </div>
+              <tbody>
+                {rankedEmployees.map((emp, index) => (
+                  <tr key={emp._id}>
+                    <td>
+                      <span className="rank-badge">{index + 1}</span>
+                    </td>
 
-      {rankedEmployees.length === 0 && <p>No employees found</p>}
+                    <td>
+                      <div className="employee-cell">
+                        <div className="avatar">{emp.name.charAt(0)}</div>
+                        <div>
+                          <h4>{emp.name}</h4>
+                          <p>{emp.email}</p>
+                        </div>
+                      </div>
+                    </td>
+
+                    <td>{emp.department}</td>
+
+                    <td>
+                      <div className="score-cell">
+                        <div className="score-bar green">
+                          <span style={{ width: `${emp.performanceScore}%` }}></span>
+                        </div>
+                        <strong>{emp.performanceScore}%</strong>
+                      </div>
+                    </td>
+
+                    <td>
+                      <span className="ai-score">
+                        {(emp.performanceScore / 10).toFixed(1)}
+                      </span>
+                    </td>
+
+                    <td>
+                      <span
+                        className={
+                          emp.performanceScore >= 85
+                            ? "status-good"
+                            : emp.performanceScore >= 60
+                            ? "status-mid"
+                            : "status-low"
+                        }
+                      >
+                        {emp.performanceScore >= 85
+                          ? "Exceeding"
+                          : emp.performanceScore >= 60
+                          ? "On Track"
+                          : "Needs Training"}
+                      </span>
+                    </td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
+
+          {rankedEmployees.length === 0 && <p className="empty-text">No employees found</p>}
+        </div>
+      )}
     </div>
   );
 }

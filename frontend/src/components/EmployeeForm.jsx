@@ -48,20 +48,92 @@ function EmployeeForm({ fetchEmployees }) {
   };
 
   return (
-    <div className="card">
-      <h2>Employee Registration Form</h2>
+    <div className="content-card">
+      <div className="card-header">
+        <div>
+          <h2>Add New Employee</h2>
+          <p>Register employee details, skills, score, and experience.</p>
+        </div>
+      </div>
 
-      {message && <p className="message">{message}</p>}
+      {message && <p className="success-box">{message}</p>}
 
-      <form className="grid-form" onSubmit={addEmployee}>
-        <input name="name" value={form.name} placeholder="Employee Name" onChange={handleChange} required />
-        <input name="email" value={form.email} type="email" placeholder="Email" onChange={handleChange} required />
-        <input name="department" value={form.department} placeholder="Department" onChange={handleChange} required />
-        <input name="skills" value={form.skills} placeholder="Skills comma separated" onChange={handleChange} required />
-        <input name="performanceScore" value={form.performanceScore} type="number" placeholder="Performance Score" onChange={handleChange} required />
-        <input name="experience" value={form.experience} type="number" placeholder="Years of Experience" onChange={handleChange} required />
+      <form className="employee-form" onSubmit={addEmployee}>
+        <div>
+          <label>Employee Name</label>
+          <input
+            name="name"
+            value={form.name}
+            placeholder="Alex Morgan"
+            onChange={handleChange}
+            required
+          />
+        </div>
 
-        <button type="submit">Add Employee</button>
+        <div>
+          <label>Email</label>
+          <input
+            name="email"
+            value={form.email}
+            type="email"
+            placeholder="alex@company.com"
+            onChange={handleChange}
+            required
+          />
+        </div>
+
+        <div>
+          <label>Department</label>
+          <input
+            name="department"
+            value={form.department}
+            placeholder="Development"
+            onChange={handleChange}
+            required
+          />
+        </div>
+
+        <div>
+          <label>Skills</label>
+          <input
+            name="skills"
+            value={form.skills}
+            placeholder="React, Node.js, MongoDB"
+            onChange={handleChange}
+            required
+          />
+        </div>
+
+        <div>
+          <label>Performance Score</label>
+          <input
+            name="performanceScore"
+            value={form.performanceScore}
+            type="number"
+            min="0"
+            max="100"
+            placeholder="85"
+            onChange={handleChange}
+            required
+          />
+        </div>
+
+        <div>
+          <label>Years of Experience</label>
+          <input
+            name="experience"
+            value={form.experience}
+            type="number"
+            min="0"
+            placeholder="3"
+            onChange={handleChange}
+            required
+          />
+        </div>
+
+        <button className="primary-btn" type="submit">
+          Add Employee
+        </button>
       </form>
     </div>
   );
