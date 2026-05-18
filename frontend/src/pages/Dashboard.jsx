@@ -15,12 +15,25 @@ function Dashboard() {
   const [chatOpen, setChatOpen] = useState(false);
   const [chatMessages, setChatMessages] = useState([{ sender: 'bot', text: 'Hi! I am InsightHR Assistant. How can I help you today?' }]);
   const [chatInput, setChatInput] = useState('');
+  const [chatLoading, setChatLoading] = useState(false);
 
-  const handleSendMessage = (e) => {
+  const handleSendMessage = async (e) => {
     e.preventDefault();
     if (!chatInput.trim()) return;
-    setChatMessages(prev => [...prev, { sender: 'user', text: chatInput }, { sender: 'bot', text: 'I am a simple AI assistant. I recommend using our AI Analytics tab to get the best insights!' }]);
+    
+    const userMessage = chatInput;
+    setChatMessages(prev => [...prev, { sender: 'user', text: userMessage }]);
     setChatInput('');
+    setChatLoading(true);
+
+    try {
+      const res = await API.post('/api/ai/chat', { message: userMessage });
+      setChatMessages(prev => [...prev, { sender: 'bot', text: res.data.reply }]);
+    } catch (error) {
+      setChatMessages(prev => [...prev, { sender: 'bot', text: "Sorry, I'm having trouble connecting to the server." }]);
+    } finally {
+      setChatLoading(false);
+    }
   };
 
   const handleExportCSV = () => {
@@ -270,20 +283,26 @@ function Dashboard() {
                   <p>{msg.text}</p>
                 </div>
               ))}
+              {chatLoading && (
+                <div className="chat-message bot">
+                  <p>Thinking...</p>
+                </div>
+              )}
             </div>
             <form className="chatbot-input" onSubmit={handleSendMessage}>
               <input 
                 value={chatInput} 
                 onChange={(e) => setChatInput(e.target.value)} 
                 placeholder="Ask me anything..." 
+                disabled={chatLoading}
               />
-              <button type="submit">Send</button>
+              <button type="submit" disabled={chatLoading}>Send</button>
             </form>
           </div>
         )}
         {!chatOpen && (
-          <button className="floating-chat-btn" onClick={() => setChatOpen(true)}>
-            💬
+          <button className="floating-chat-btn text-btn" onClick={() => setChatOpen(true)}>
+            💬 Chat with AI HR
           </button>
         )}
       </main>

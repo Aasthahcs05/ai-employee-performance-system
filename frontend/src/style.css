@@ -1106,8 +1106,8 @@ td {
   width: 50px;
   height: 50px;
   border-radius: 50%;
-  background: var(--primary-color);
-  color: white;
+  background: #111827;
+  color: #ffffff;
   border: none;
   font-size: 24px;
   cursor: pointer;
@@ -1117,6 +1117,20 @@ td {
   justify-content: center;
   transition: transform 0.2s ease, box-shadow 0.2s ease;
   z-index: 1000;
+}
+
+.floating-chat-btn.text-btn {
+  width: auto;
+  border-radius: 25px;
+  padding: 0 20px;
+  font-size: 15px;
+  font-weight: 600;
+  gap: 8px;
+}
+
+body.dark-theme .floating-chat-btn {
+  background: #e0e0e0;
+  color: #111827;
 }
 
 .floating-chat-btn:hover {
