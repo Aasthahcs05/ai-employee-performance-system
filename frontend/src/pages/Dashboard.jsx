@@ -26,16 +26,29 @@ function Dashboard() {
     fetchEmployees();
   }, []);
 
-  const totalEmployees = employees.length;
+  const safeEmployees = employees.map((emp) => ({
+    ...emp,
+    name: emp?.name || "Employee",
+    email: emp?.email || "No email",
+    department: emp?.department || "Not Assigned",
+    performanceScore: Number(emp?.performanceScore || 0),
+    skills: Array.isArray(emp?.skills) ? emp.skills : [],
+    experience: emp?.experience ?? 0
+  }));
+
+  const totalEmployees = safeEmployees.length;
+
   const averageScore =
     totalEmployees === 0
       ? 0
       : (
-          employees.reduce((sum, emp) => sum + emp.performanceScore, 0) /
+          safeEmployees.reduce((sum, emp) => sum + emp.performanceScore, 0) /
           totalEmployees
         ).toFixed(1);
 
-  const highPerformers = employees.filter((emp) => emp.performanceScore >= 85).length;
+  const highPerformers = safeEmployees.filter(
+    (emp) => emp.performanceScore >= 85
+  ).length;
 
   return (
     <div className="app-shell">
@@ -85,19 +98,21 @@ function Dashboard() {
             </div>
 
             <div className="dashboard-grid">
-              <AnalyticsRanking employees={employees} compact={true} />
+              <AnalyticsRanking employees={safeEmployees} compact={true} />
 
               <div className="right-column">
                 <div className="mini-card">
                   <h3>Trending Employees</h3>
 
-                  {employees
+                  {safeEmployees
                     .slice()
                     .sort((a, b) => b.performanceScore - a.performanceScore)
                     .slice(0, 3)
                     .map((emp) => (
-                      <div className="trend-row" key={emp._id}>
-                        <div className="avatar">{emp.name.charAt(0)}</div>
+                      <div className="trend-row" key={emp._id || emp.email}>
+                        <div className="avatar">
+                          {emp.name.charAt(0).toUpperCase()}
+                        </div>
                         <div>
                           <h4>{emp.name}</h4>
                           <p>{emp.department}</p>
@@ -173,7 +188,7 @@ function Dashboard() {
             {showForm && <EmployeeForm fetchEmployees={fetchEmployees} />}
 
             <EmployeeList
-              employees={employees}
+              employees={safeEmployees}
               fetchEmployees={fetchEmployees}
             />
 
@@ -199,7 +214,7 @@ function Dashboard() {
               </div>
             </div>
 
-            <AnalyticsRanking employees={employees} />
+            <AnalyticsRanking employees={safeEmployees} />
 
             <AIRecommendation />
           </section>
